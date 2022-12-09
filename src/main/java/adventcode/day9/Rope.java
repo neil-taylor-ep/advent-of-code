@@ -37,34 +37,16 @@ public class Rope {
     }
 
     private void follow(Point follower, Point leader) {
-        // Translate the follower to catch up with the leader.
 
         int dx = Math.abs(leader.x - follower.x);
         int dy = Math.abs(leader.y - follower.y);
-        // First check if they are touching
-        if (dx <= 1 && dy <= 1) {
-            return;
-        }
 
-        if (leader.x == follower.x && leader.y - follower.y == 2) {
-            follower.translate(0, 1);       // Up
-        } else if (leader.x == follower.x && leader.y - follower.y == -2) {
-            follower.translate(0, -1);      // Down
-        } else if (leader.x - follower.x == -2 && leader.y == follower.y) {
-            follower.translate(-1, 0);      // Left
-        } else if (leader.x - follower.x == 2 && leader.y == follower.y) {
-            follower.translate(1, 0);       // Right
-        } else if (leader.x < follower.x && leader.y > follower.y) {
-            follower.translate(-1, 1);      // Left and up
-        } else if (leader.x > follower.x && leader.y > follower.y) {
-            follower.translate(1, 1);       // Right and up
-        } else if (leader.x > follower.x && leader.y < follower.y) {
-            follower.translate(1, -1);      // Right and down
-        } else if (leader.x < follower.x && leader.y < follower.y) {
-            follower.translate(-1, -1);     // Left and down
-        } else {
-            throw new RuntimeException("Unexpected positions l=" + leader + " f=" + follower);
+        // If they are not touching
+        if (dx > 1 || dy > 1) {
+            // Translate the follower to catch up with the leader.
+            follower.translate(Integer.signum(leader.x - follower.x), Integer.signum(leader.y - follower.y));
         }
+        
     }
 
 

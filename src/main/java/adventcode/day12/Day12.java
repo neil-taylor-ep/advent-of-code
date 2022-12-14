@@ -16,10 +16,10 @@ public class Day12 {
     static Set<String> Q = new HashSet<>();
     static String start = null;
     static String end = null;
+    static boolean ascending = true;
 
     public static void main(String[] args) throws IOException {
 
-        // Part 1
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream("input12.txt")))) {
 
             // Read the input into a map of coordinate -> altitude
@@ -39,44 +39,65 @@ public class Day12 {
                         vertices.put(key, c);
                     }
                     dist.put(key, Integer.MAX_VALUE);
-                    Q.add(key);
                     x++;
                 }
                 y++;
             }
 
-            // Dijkstra
+            // Part 1
             dist.put(start, 0);
-            while (!Q.isEmpty()) {
-                String u = getNearest();
-                if (end.equals(u)) {
-                    break;
-                }
-                Q.remove(u);
-
-                for (String v : getNeighbours(u)) {
-                    int alt = dist.get(u) + 1;
-                    if (alt < dist.get(v)) {
-                        dist.put(v, alt);
-                        prev.put(v, u);
-                    }
-                }
-            }
-
-            // Backtrack from end to start to find the path
-            List<String> path = new ArrayList<>();
-            String u = end;
-            while (prev.get(u) != null) {
-                path.add(u);
-                u = prev.get(u);
-            }
-
+            Q.addAll(vertices.keySet());
+            List<String> path = dijkstra(end);
             System.out.println("Path " + path.size());
 
+
+            // Part 2
+            for (Map.Entry<String, Integer> entry : dist.entrySet()) {
+                entry.setValue(Integer.MAX_VALUE);
+            }
+            prev.clear();
+            dist.put(end, 0);
+            Q.clear();
+            Q.addAll(vertices.keySet());
+            ascending = false;
+            path = dijkstra(start);
+            System.out.println("Path " + path.size());
         }
 
 
 
+    }
+
+    private static List<String> dijkstra(String target) {
+        while (!Q.isEmpty()) {
+            String u = getNearest();
+
+            // Check for end condition
+            if (ascending && target.equals(u)) {
+                break;
+            } else if(!ascending && vertices.get(u) == 'a') {
+                target = u;
+                break;
+            }
+            Q.remove(u);
+
+            for (String v : getNeighbours(u)) {
+                int alt = dist.get(u) + 1;
+                if (alt < dist.get(v)) {
+                    dist.put(v, alt);
+                    prev.put(v, u);
+                }
+            }
+        }
+
+        // Backtrack from end to start to find the path
+        List<String> path = new ArrayList<>();
+        String u = target;
+        while (prev.get(u) != null) {
+            path.add(u);
+            u = prev.get(u);
+        }
+        return path;
     }
 
     private static String getNearest() {
@@ -98,17 +119,17 @@ public class Day12 {
         int y = Integer.parseInt(u.split(",")[1]);
 
         Set<String> neighbours = new HashSet<>();
-        if (isPassable(u, x-1 + "," + y)) {
-            neighbours.add(x-1 + "," + y);
+        if (isPassable(u, x - 1 + "," + y)) {
+            neighbours.add(x - 1 + "," + y);
         }
-        if (isPassable(u, x+1 + "," + y)) {
-            neighbours.add(x+1 + "," + y);
+        if (isPassable(u, x + 1 + "," + y)) {
+            neighbours.add(x + 1 + "," + y);
         }
-        if (isPassable(u, x + "," + (y-1))) {
-            neighbours.add(x + "," + (y-1));
+        if (isPassable(u, x + "," + (y - 1))) {
+            neighbours.add(x + "," + (y - 1));
         }
-        if (isPassable(u, x + "," + (y+1))) {
-            neighbours.add(x + "," + (y+1));
+        if (isPassable(u, x + "," + (y + 1))) {
+            neighbours.add(x + "," + (y + 1));
         }
         return neighbours;
     }
@@ -116,7 +137,10 @@ public class Day12 {
     private static boolean isPassable(String from, String to) {
         if (vertices.containsKey(to)) {
             int distanceToClimb = vertices.get(to) - vertices.get(from);
-            return distanceToClimb < 2;
+            if (ascending)
+                return distanceToClimb < 2;
+            else
+                return distanceToClimb > -2;
         }
         return false;
     }

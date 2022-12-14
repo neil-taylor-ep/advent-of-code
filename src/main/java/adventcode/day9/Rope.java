@@ -46,7 +46,7 @@ public class Rope {
             // Translate the follower to catch up with the leader.
             follower.translate(Integer.signum(leader.x - follower.x), Integer.signum(leader.y - follower.y));
         }
-        
+
     }
 
 

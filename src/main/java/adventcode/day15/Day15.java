@@ -35,8 +35,14 @@ public class Day15 {
             }
 
             int y = 2000000;
-            int startX = -10000000;      //Check the start and end; they should be min and max reach of sensors
-            int endX = 10000000;
+            int startX = Integer.MAX_VALUE;
+            int endX = Integer.MIN_VALUE;
+            for (int i = 0; i<sensors.length; i++) {
+                int min = sensors[i].x - sensorRange[i];
+                if (min < startX) startX = min;
+                int max = sensors[i].x + sensorRange[i];
+                if (max > endX) endX = max;
+            }
 
             int count = 0;
             for (int x=startX; x<endX; x++) {
